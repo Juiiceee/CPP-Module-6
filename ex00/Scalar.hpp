@@ -2,20 +2,28 @@
 # define SCALAR_HPP
 # include <iostream>
 # include <string>
+#include <cmath>
+#include <climits>
+#include <limits>
+
+	typedef enum type
+	{
+		CHAR,
+		INT,
+		FLO,
+		DOUB,
+		DIF,
+		BAD
+	} type;
 
 class Scalar
 {
-	public:
+
+
+	private:
 		Scalar();
 		Scalar(const Scalar &obj);
 		Scalar &operator=(const Scalar &obj);
 		~Scalar();
-	typedef enum type
-	{
-		Char,
-		Int,
-		Float,
-		Double
-	} type;
 };
 #endif
