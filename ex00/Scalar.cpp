@@ -13,6 +13,7 @@ Scalar::Scalar(const Scalar &obj)
 
 Scalar &Scalar::operator=(const Scalar &obj)
 {
+	(void)obj;
 	std::cout << "Copy assignment operator called\n";
 	return *this;
 }
@@ -30,12 +31,12 @@ bool isChar(const std::string &str)
 bool isDoub(const std::string &str)
 {
 	char *endptr = NULL;
-	double nbr = std::strtod(str.c_str(), &endptr);
+	double nbr = strtod(str.c_str(), &endptr);
 	if (*endptr == '\0')
 	{
 		if (nbr == -HUGE_VAL || nbr == HUGE_VAL)
 			return (0);
-		int length = str.find('.');
+		size_t length = str.find('.');
 		if (length == str.size() - 2 && length != std::string::npos)
 			return (1);
 	}
@@ -45,14 +46,14 @@ bool isDoub(const std::string &str)
 bool isFloat(const std::string &str)
 {
 	char *endptr = NULL;
-	float nbr = std::strtof(str.c_str(), &endptr);
+	float nbr = strtof(str.c_str(), &endptr);
 	if (*endptr == 'f' && endptr == &str[str.size() - 1])
 	{
 		if (nbr == -HUGE_VALF || nbr == HUGE_VALF)
 			return (0);
 		std::string feuille = str.substr(0, endptr - str.c_str());
-		int length = feuille.find('.');
-		if (length == str.size() - 3 && length != std::string::npos)
+		size_t length = feuille.find('.');
+		if (length != std::string::npos && length == str.size() - 3)
 			return (1);
 	}
 	return (0);
@@ -61,7 +62,7 @@ bool isFloat(const std::string &str)
 bool isInt(const std::string &str)
 {
 	char *endptr = NULL;
-	long nbr = std::strtol(str.c_str(), &endptr, 10);
+	long nbr = strtol(str.c_str(), &endptr, 10);
 	if (*endptr == '\0')
 	{
 		if ((nbr == LONG_MAX || nbr == LONG_MIN) || (nbr > std::numeric_limits<int>::max() || nbr < std::numeric_limits<int>::min()))
@@ -71,9 +72,14 @@ bool isInt(const std::string &str)
 	return (0);
 }
 
+bool isDif(const std::string &str)
+{
+	return (str == "nan" || str == "nanf" || str == "-inff" || str == "-inf" || str == "inff" || str == "inf");
+}
+
 void	printChar(char c)
 {
-	std::cout << "Char: " << c << std::endl;
+	std::cout << "Char: '" << c << "'" << std::endl;
 }
 
 void	printInt(int nb)
@@ -88,7 +94,7 @@ void	printDouble(double nb)
 
 void	printFloat(float nb)
 {
-	std::cout << "Float: " << nb << "f" << std::endl;
+	std::cout << std::fixed << std::setprecision(1) <<"Float: " << nb << "f" << std::endl;
 }
 
 void	Char(std::string str)
@@ -106,7 +112,7 @@ void	Int(std::string str)
 	if (nb >= 32 && nb <= 126)
 		printChar(static_cast<char>(nb));
 	else
-		std::cout << "Char: Unpritable Char" << std::endl;
+		std::cout << "Char: Unpritable Char\n";
 	printInt(static_cast<int>(nb));
 	printFloat(static_cast<float>(nb));
 	printDouble(static_cast<double>(nb));
@@ -120,7 +126,7 @@ void	Float(std::string str)
 	if (nb >= 32 && nb <= 126)
 		printChar(static_cast<char>(nb));
 	else
-		std::cout << "Char: Unpritable Char" << std::endl;
+		std::cout << "Char: Unpritable Char\n";
 	if ((nbl == LONG_MAX || nbl == LONG_MIN) || (nbl > std::numeric_limits<int>::max() || nbl < std::numeric_limits<int>::min()))
 		std::cout << "Int: Unpritable Int\n";
 	else
@@ -129,22 +135,63 @@ void	Float(std::string str)
 	printDouble(static_cast<double>(nbf));
 }
 
+void	Double(std::string str)
+{
+	float	nbf = atof(str.c_str());
+	int		nb = roundf(nbf);
+	long	nbl = atol(str.c_str());
+	double nbd = strtod(str.c_str(), NULL);
+	if (nb >= 32 && nb <= 126)
+		printChar(static_cast<char>(nb));
+	else
+		std::cout << "Char: Unpritable Char\n";
+	if ((nbl == LONG_MAX || nbl == LONG_MIN) || (nbl > std::numeric_limits<int>::max() || nbl < std::numeric_limits<int>::min()))
+		std::cout << "Int: Unpritable Int\n";
+	else
+		printInt(static_cast<int>(nbd));
+	printFloat(static_cast<float>(nbd));
+	printDouble(static_cast<double>(nbf));
+}
+
+void	printDif(std::string str)
+{
+	std::cout << "Char: Unpritable Char\n";
+	std::cout << "Int: Unpritable Int\n";
+	if (str == "nan" || str == "nanf")
+	{
+		std::cout << "Float: nanf\n";
+		std::cout << "Double: nan\n";
+	}
+	else if (str == "-inff" || str == "-inf")
+	{
+		std::cout << "Float: -inff\n";
+		std::cout << "Double: -inf\n";
+	}
+	else
+	{
+		std::cout << "Float: inff\n";
+		std::cout << "Double: inf\n";
+	}
+}
+
 type checkType(const std::string &str)
 {
 	if (isChar(str))
 		return (CHAR);
 	if (isInt(str))
 		return (INT);
-	if (isDoub(str))
-		return (DOUB);
 	if (isFloat(str))
 		return (FLO);
+	if (isDoub(str))
+		return (DOUB);
+	if (isDif(str))
+		return (DIF);
 	return (BAD);
 }
 
 void	error(std::string &str)
 {
-	std::cout << "Bad input:\n" << str;
+	std::cout << "Bad input: '" << str << "'\n";
 }
 
 void Scalar::convert(const std::string &str)
@@ -163,7 +210,10 @@ void Scalar::convert(const std::string &str)
 			Float(str);
 			break;
 		case DOUB:
-			
+			Double(str);
+			break;
+		case DIF:
+			printDif(str);
 			break;
 		case BAD:
 			std::cout << "No input looks like a type\n";

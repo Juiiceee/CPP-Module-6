@@ -5,13 +5,14 @@
 #include <cmath>
 #include <climits>
 #include <limits>
-
+#include <iomanip>
 	typedef enum type
 	{
 		CHAR,
 		INT,
 		FLO,
 		DOUB,
+		DIF,
 		BAD
 	} type;
 
